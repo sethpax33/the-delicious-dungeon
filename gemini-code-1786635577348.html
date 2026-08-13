@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dungeon Meshi: Ultimate Culinary Quest</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="main-menu-overlay" class="menu-overlay">
+    <div class="menu-card">
+      <h1>⚔️ DUNGEON MESHI 🍲</h1>
+      <p class="menu-subtitle">Welcome, Dungeon Chef! Select a Save Slot to Begin:</p>
+      
+      <div id="save-slots-container" class="save-slots-list"></div>
+
+      <div id="name-input-box" class="name-input-modal" style="display: none;">
+        <h3>Create New Chef Profile</h3>
+        <input type="text" id="player-name-input" placeholder="Enter your Chef Name..." maxlength="16">
+        <div class="modal-buttons">
+          <button onclick="confirmNewSave()" class="btn-cook">Start Adventure</button>
+          <button onclick="cancelNameInput()" class="btn-clear">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="main-wrapper" style="display: none;">
+    
+    <header>
+      <span class="torch left">🔥</span>
+      <h1>⚔️ DUNGEON MESHI: CULINARY QUEST 🍲</h1>
+      <span class="torch right">🔥</span>
+      <button onclick="openMainMenu()" class="btn-menu-return">🏠 Save & Main Menu</button>
+    </header>
+
+    <div class="game-layout">
+
+      <div>
+        <div class="panel-box">
+          <h2>🏰 Chef <span id="player-display-name" style="color:#f4c430;">Chef</span>'s Party</h2>
+          <div class="bar-container">
+            <div class="bar-label"><span>Health Points</span><span id="hp-text">100 / 100</span></div>
+            <div class="progress-bar"><div id="hp-bar" class="fill-hp"></div></div>
+          </div>
+          <div class="bar-container">
+            <div class="bar-label"><span>Fullness</span><span id="hunger-text">100 / 100</span></div>
+            <div class="progress-bar"><div id="hunger-bar" class="fill-hunger"></div></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; margin-top: 4px;">
+            <span>🛡️ Armor: <span id="armor-val" style="color:#6495ed;">0</span></span>
+            <span>🪙 Gold: <span id="gold-val" style="color:#ffd700;">0</span></span>
+          </div>
+        </div>
+
+        <div class="panel-box">
+          <h2>🪜 Select Floor (5 Monsters/Floor)</h2>
+          <div class="floor-list" id="floor-selector-column"></div>
+        </div>
+
+        <button id="btn-explore" onclick="explore()" style="width: 100%; padding: 10px; font-size: 13px;">⚔️ Explore Floor Monsters</button>
+      </div>
+
+      <div>
+        <div class="panel-box">
+          <h2>🍲 <span id="pot-title-name">Chef</span>'s Pot <span style="font-size:10px; color:#f4c430;" id="pot-count-indicator">(0/5 Items)</span></h2>
+          <div style="font-size:10px; color:#aaa; margin-bottom:4px;">Drag ingredients from inventory into the pot (Max 5):</div>
+          <div class="ingredient-shelf" id="ingredient-shelf-display"></div>
+
+          <div class="drop-zone" id="pot-drop-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handlePotDrop(event)">
+            <span style="font-size: 22px;">🍲</span>
+            <div style="font-size:10px; color:#aaa; margin: 2px 0;">[ Drag & Drop Ingredients Here - Max 5 ]</div>
+            <div class="pot-contents" id="pot-display">Empty</div>
+          </div>
+
+          <div style="display: flex; gap: 6px;">
+            <button class="btn-cook" onclick="cookPot()" style="flex: 2;">🍳 Cook Ingredients</button>
+            <button class="btn-clear" onclick="clearPot()" style="flex: 1;">Clear Pot</button>
+          </div>
+        </div>
+
+        <div class="panel-box">
+          <h2>📖 Recipe Finder & Inspector</h2>
+          <div class="recipe-inspector">
+            <div class="drop-zone" id="recipe-drop-zone" style="padding: 8px; margin: 0 0 6px 0;" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleRecipeMenuDrop(event)">
+              🔍 Drag any raw ingredient here to inspect all recipes!
+            </div>
+            
+            <div class="recipe-filter-bar">
+              <span style="font-size: 10px; color: #aaa; width: 100%; display: block; margin-bottom: 2px;">Filter Recipes by Ingredient Count:</span>
+              <button class="btn-filter active" id="filter-btn-1" onclick="setRecipeFilter(1)">1 Item</button>
+              <button class="btn-filter" id="filter-btn-2" onclick="setRecipeFilter(2)">2 Items</button>
+              <button class="btn-filter" id="filter-btn-3" onclick="setRecipeFilter(3)">3 Items</button>
+              <button class="btn-filter" id="filter-btn-4" onclick="setRecipeFilter(4)">4 Items</button>
+              <button class="btn-filter" id="filter-btn-5" onclick="setRecipeFilter(5)">5 Items</button>
+            </div>
+
+            <div id="recipe-inspector-header" style="font-size:11px; font-weight:bold; color:#f4c430; margin-top: 6px;">Drop an item above...</div>
+            <div class="recipe-results-list" id="recipe-results-list">
+              <div style="color:#666; font-size:10px;">Drag an item above to discover every potential dish combination in the game!</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-box">
+          <h2>📜 Adventure Log</h2>
+          <div id="log"><div>> Drag raw ingredients into the pot to cook or into the Recipe Finder to inspect dishes!</div></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel-box">
+          <h2>🍱 Pantry (Prepared Meals)</h2>
+          <div class="meals-list" id="meals-inventory-list"></div>
+        </div>
+
+        <div class="panel-box">
+          <h2>🛒 Merchant Stall (Barter Discounts)</h2>
+          <div class="shop-list" id="shop-armor-list"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
