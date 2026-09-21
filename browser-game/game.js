@@ -22,7 +22,7 @@ const ui={
 const state={screen:"home",level:1,unlocked:1,food:0,coins:0,kills:0,hp:100,sensitivity:1,volume:.7,shake:true,saveSlot:0};
 const keys=new Set();
 const enemies=[],arrows=[],particles=[],pickups=[];
-let dungeonGroup=null,playerGroup=null,bow=null,bowString=null;
+let dungeonGroup=null,playerGroup=null,magicFocus=null;
 let yaw=0,pitch=.38,last=performance.now(),shotCD=0,msgTimer=0,shakeTimer=0,victoryTimer=null;
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -116,12 +116,9 @@ function createPlayer(){
  const head=new THREE.Mesh(new THREE.SphereGeometry(.5,18,14),mat(0xe0b16f,.72));head.position.y=2.1;head.castShadow=true;playerGroup.add(head);
  const hood=new THREE.Mesh(new THREE.ConeGeometry(.62,.85,18),mat(0x5b3828,.9));hood.position.y=2.5;hood.castShadow=true;playerGroup.add(hood);
  for(const sx of [-.22,.22]){const eye=new THREE.Mesh(new THREE.SphereGeometry(.065,8,6),new THREE.MeshStandardMaterial({color:0x17100c,roughness:.4}));eye.position.set(sx,2.12,.45);playerGroup.add(eye);}
- bow=new THREE.Group();
- const curve=new THREE.QuadraticBezierCurve3(new THREE.Vector3(0,-.85,0),new THREE.Vector3(.62,0,0),new THREE.Vector3(0,.85,0));
- const pts=curve.getPoints(24),geo=new THREE.BufferGeometry().setFromPoints(pts),line=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0x9a6035}));
- line.rotation.z=-.18;bow.add(line);
- bowString=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,-.85,.01),new THREE.Vector3(0,.85,.01)]),new THREE.LineBasicMaterial({color:0xdccfb4}));
- bow.add(bowString);bow.position.set(.8,1.45,.35);bow.rotation.y=Math.PI/2;playerGroup.add(bow);
+ magicFocus=new THREE.Mesh(new THREE.OctahedronGeometry(.18,1),new THREE.MeshStandardMaterial({color:0x79d8ff,emissive:0x278dff,emissiveIntensity:2}));
+ magicFocus.position.set(.72,1.55,.42);magicFocus.castShadow=true;playerGroup.add(magicFocus);
+ const glow=new THREE.PointLight(0x49bfff,1.2,3);glow.position.copy(magicFocus.position);playerGroup.add(glow);
 }
 function startLevel(level){
  state.level=level;showScreen(null);if(document.pointerLockElement!==canvas)canvas.requestPointerLock?.();
@@ -141,15 +138,15 @@ function completeLevel(){
  victoryTimer=setTimeout(()=>{victoryTimer=null;state.unlocked=Math.max(state.unlocked,Math.min(3,state.level+1));save(state.saveSlot);renderLevels();showScreen("levels");},1400);
  say(state.level===3?"BOSS DEFEATED!":"LEVEL COMPLETE! NEXT LEVEL UNLOCKED",1400);
 }
-function fireArrow(){
+function castSpell(){
  if(state.screen!=="game"||shotCD>0)return;
  shotCD=.42;
  const forward=new THREE.Vector3(Math.sin(yaw),0,Math.cos(yaw)).negate(),pos=playerGroup.position.clone().add(new THREE.Vector3(0,1.6,0)),dir=forward.clone();
  dir.y=Math.sin(pitch);dir.normalize();
- const shaft=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,1.25,8),woodMat);shaft.rotation.z=Math.PI/2;shaft.castShadow=true;
- const head=new THREE.Mesh(new THREE.ConeGeometry(.11,.3,8),goldMat);head.rotation.z=-Math.PI/2;head.position.x=.78;shaft.add(head);
- shaft.position.copy(pos);shaft.quaternion.setFromUnitVectors(new THREE.Vector3(1,0,0),dir);scene.add(shaft);
- arrows.push({mesh:shaft,dir,life:2.5,speed:24});bow.scale.z=.65;setTimeout(()=>{if(bow)bow.scale.z=1},120);
+ const orb=new THREE.Mesh(new THREE.SphereGeometry(.16,12,10),new THREE.MeshStandardMaterial({color:0x7ee7ff,emissive:0x2b9dff,emissiveIntensity:3}));
+ orb.position.copy(pos);scene.add(orb);
+ const light=new THREE.PointLight(0x4fc9ff,2,4);orb.add(light);
+ arrows.push({mesh:orb,dir,life:2.2,speed:24});if(magicFocus){magicFocus.scale.setScalar(1.6);setTimeout(()=>{if(magicFocus)magicFocus.scale.setScalar(1)},120);}
 }
 function hitEnemy(e,damage){
  e.hp-=damage;e.hurt=.16;
@@ -211,7 +208,7 @@ function checkVictory(){if(state.screen==="game"&&enemies.length===0&&!victoryTi
 
 canvas.addEventListener("click",()=>{if(state.screen==="game")canvas.requestPointerLock?.();});
 document.addEventListener("mousemove",e=>{if(state.screen!=="game"||document.pointerLockElement!==canvas)return;yaw-=e.movementX*.0024*state.sensitivity;pitch=clamp(pitch-e.movementY*.0018*state.sensitivity,-.15,.85);});
-document.addEventListener("mousedown",e=>{if(state.screen==="game"&&e.button===0)fireArrow();});
+document.addEventListener("mousedown",e=>{if(state.screen==="game"&&e.button===0)castSpell();});
 document.addEventListener("pointerlockchange",()=>{if(state.screen==="game"&&document.pointerLockElement!==canvas){showScreen("pause");}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&state.screen==="game"){document.exitPointerLock?.();showScreen("pause");}});
 document.getElementById("playBtn").onclick=()=>{renderLevels();showScreen("levels");};
