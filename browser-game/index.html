@@ -1,2 +1,70 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>The Delicious Dungeon</title><link rel="stylesheet" href="styles.css"></head><body><div id="gameShell"><canvas id="game" width="1280" height="720"></canvas><div id="hud"><b>THE DELICIOUS DUNGEON</b><span>❤️ <i id="hp">100</i> &nbsp; 🍖 <i id="food">0</i> &nbsp; 🪙 <i id="coins">0</i> &nbsp; ☠ <i id="kills">0</i></span></div><div id="hint">WASD / arrows • Mouse to aim • Click to attack • E at the fire</div><div id="msg"></div></div><script src="game.js"></script></body></html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Delicious Dungeon 3D</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="gameShell">
+  <canvas id="game"></canvas>
+
+  <div id="homeScreen" class="screen">
+    <div class="panel titlePanel">
+      <div class="eyebrow">A 3D BROWSER DUNGEON</div>
+      <h1>THE DELICIOUS<br><span>DUNGEON</span></h1>
+      <p>Explore forgotten halls, hunt monsters, collect ingredients, and survive the bosses.</p>
+      <button id="playBtn">PLAY</button>
+      <button id="continueBtn" class="secondary">CONTINUE</button>
+      <button id="settingsBtn" class="secondary">SETTINGS</button>
+    </div>
+  </div>
+
+  <div id="levelScreen" class="screen hidden">
+    <div class="panel">
+      <h2>CHOOSE A LEVEL</h2>
+      <p class="sub">Finish a level to unlock the next one.</p>
+      <div id="levelButtons" class="levelGrid"></div>
+      <button id="levelBackBtn" class="secondary">BACK</button>
+    </div>
+  </div>
+
+  <div id="settingsScreen" class="screen hidden">
+    <div class="panel settingsPanel">
+      <h2>SETTINGS</h2>
+      <label>Mouse sensitivity <span id="sensValue">1.00</span><input id="sens" type="range" min=".4" max="2" step=".05" value="1"></label>
+      <label>Master volume <span id="volumeValue">70%</span><input id="volume" type="range" min="0" max="1" step=".05" value=".7"></label>
+      <label class="check"><input id="shake" type="checkbox" checked> Screen shake</label>
+      <div class="saveRow"><button id="saveBtn">SAVE FILE</button><button id="loadBtn" class="secondary">LOAD FILE</button></div>
+      <div id="saveSlots" class="saveSlots"></div>
+      <button id="settingsBackBtn" class="secondary">BACK</button>
+    </div>
+  </div>
+
+  <div id="pauseScreen" class="screen hidden">
+    <div class="panel">
+      <h2>PAUSED</h2>
+      <button id="resumeBtn">RESUME</button>
+      <button id="pauseSettingsBtn" class="secondary">SETTINGS</button>
+      <button id="quitBtn" class="secondary">QUIT TO MENU</button>
+    </div>
+  </div>
+
+  <div id="hud" class="hidden">
+    <div><b>THE DELICIOUS DUNGEON</b><small id="levelLabel">LEVEL 1</small></div>
+    <div class="stats">
+      <span>❤ <i id="hp">100</i></span>
+      <span>🍖 <i id="food">0</i></span>
+      <span>🪙 <i id="coins">0</i></span>
+      <span>☠ <i id="kills">0</i></span>
+    </div>
+    <div id="bossBar" class="bossBar hidden"><span id="bossName">BOSS</span><div><i id="bossHp"></i></div></div>
+  </div>
+  <div id="crosshair" class="hidden">+</div>
+  <div id="hint" class="hidden">WASD move · Mouse aim · Click fire arrow · E cook · ESC pause</div>
+  <div id="msg"></div>
+</div>
+<script type="module" src="game.js"></script>
+</body>
+</html>
